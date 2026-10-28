@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>DE Lab Store (test site)</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 760px; margin: 40px auto; color: #222; }
+    header { border-bottom: 2px solid #222; margin-bottom: 24px; }
+    .panel { border: 1px solid #ccc; padding: 16px; margin: 16px 0; }
+    button { padding: 8px 14px; margin: 4px 6px 4px 0; cursor: pointer; }
+    #log { background: #f6f6f6; font: 12px monospace; padding: 10px; height: 180px; overflow: auto; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <header><h1>DE Lab Store</h1><p>Test site for Enhanced Chat v2 (not a real shop)</p></header>
+
+  <div class="panel">
+    <h2>Simulate where the customer is</h2>
+    <!-- Phase 6: these set invitation custom variables -->
+    <button onclick="simulateProductPage()">I'm on a product page (Trench coat)</button>
+    <button onclick="simulateCheckoutError()">I hit a checkout error</button>
+    <button onclick="resetPage()">Reset</button>
+  </div>
+
+  <div class="panel">
+    <h2>Event log</h2>
+    <div id="log"></div>
+  </div>
+
+  <script>
+    // Context we pass to Salesforce (invitations + hidden pre-chat)
+    var pageContext = { pageType: "home", checkoutError: "false" };
+
+    function log(msg) {
+      var el = document.getElementById("log");
+      el.textContent += new Date().toLocaleTimeString() + "  " + msg + "\n";
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function pushContext() {
+      log("Context set: " + JSON.stringify(pageContext));
+      if (!window.embeddedservice_bootstrap) { log("Chat not loaded yet"); return; }
+      // Phase 6: invitation conditions read these values (they must be strings)
+      if (embeddedservice_bootstrap.invitationAPI) {
+        embeddedservice_bootstrap.invitationAPI.setCustomVariables(pageContext);
+        log("invitationAPI.setCustomVariables sent");
+      } else {
+        log("invitationAPI not available (no invitation configured yet)");
+      }
+      // Phase 7: hidden pre-chat fields travel with the conversation to the Omni flow
+      if (embeddedservice_bootstrap.prechatAPI) {
+        try {
+          embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+            Page_Context: pageContext.pageType,
+            Checkout_Error: pageContext.checkoutError
+          });
+          log("prechatAPI.setHiddenPrechatFields sent");
+        } catch (e) { log("Hidden pre-chat not set: " + e.message); }
+      }
+    }
+
+    function simulateProductPage()  { pageContext = { pageType: "product", checkoutError: "false" }; pushContext(); }
+    function simulateCheckoutError(){ pageContext = { pageType: "checkout", checkoutError: "true" };  pushContext(); }
+    function resetPage()            { pageContext = { pageType: "home", checkoutError: "false" };     pushContext(); }
+
+    // Watch what the widget does (Event Listeners doc)
+    ["onEmbeddedMessagingReady",
+     "onEmbeddedMessagingButtonCreated",
+     "onEmbeddedMessagingConversationStarted",
+     "onEmbeddedMessagingConversationClosed",
+     "onEmbeddedMessagingInvitationShown",
+     "onEmbeddedMessagingInvitationAccepted",
+     "onEmbeddedMessagingInvitationRejected"].forEach(function (evt) {
+      window.addEventListener(evt, function () {
+        log("EVENT " + evt);
+        if (evt === "onEmbeddedMessagingReady") { pushContext(); }
+      });
+    });
+  </script>
+
+  <!-- ===== Salesforce Enhanced Chat v2 code snippet goes below this line ===== -->
+  <script type='text/javascript'>
+    function initEmbeddedMessaging() {
+      try {
+        embeddedservice_bootstrap.settings.language = 'en_US';
+        embeddedservice_bootstrap.init(
+          '00Dg800000MXwzv',
+          'DE_Lab_Web_Chat',
+          'https://orgfarm-46a2e87dcd-dev-ed.develop.my.site.com/ESWDELabWebCha1793226077623',
+          { scrt2URL: 'https://orgfarm-46a2e87dcd-dev-ed.develop.my.salesforce-scrt.com' }
+        );
+        log("init called");
+      } catch (err) {
+        console.error('Error loading Embedded Messaging: ', err);
+        log("init error: " + err.message);
+      }
+    };
+  </script>
+  <script type='text/javascript' src='https://orgfarm-46a2e87dcd-dev-ed.develop.my.site.com/ESWDELabWebCha1793226077623/assets/js/bootstrap.min.js' onload='initEmbeddedMessaging()'></script>
+</body>
+</html>
