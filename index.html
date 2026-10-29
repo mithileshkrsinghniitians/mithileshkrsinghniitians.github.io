@@ -83,6 +83,8 @@
     function initEmbeddedMessaging() {
       try {
         embeddedservice_bootstrap.settings.language = 'en_US';
+        // Lab only: print the widget's internal logs (invitation decisions) to the browser console
+        embeddedservice_bootstrap.settings.devMode = true;
         embeddedservice_bootstrap.init(
           '00Dg800000MXwzv',
           'DE_Lab_Web_Chat',
