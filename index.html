@@ -9,6 +9,10 @@
     .panel { border: 1px solid #ccc; padding: 16px; margin: 16px 0; }
     button { padding: 8px 14px; margin: 4px 6px 4px 0; cursor: pointer; }
     #log { background: #f6f6f6; font: 12px monospace; padding: 10px; height: 180px; overflow: auto; white-space: pre-wrap; }
+    /* Phase 6b: our own invitation (used when "Use Custom Component" is on) */
+    #myInvite { display: none; position: fixed; right: 24px; bottom: 100px; width: 280px; background: #fff;
+                border: 2px solid #222; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,.25); z-index: 2147483000; }
+    #myInvite p { margin: 0 0 10px; }
   </style>
 </head>
 <body>
@@ -25,6 +29,13 @@
   <div class="panel">
     <h2>Event log</h2>
     <div id="log"></div>
+  </div>
+
+  <!-- Phase 6b: custom invitation; text depends on the page -->
+  <div id="myInvite">
+    <p id="myInviteText"></p>
+    <button onclick="acceptInvite()">Chat now</button>
+    <button onclick="dismissInvite()">No thanks</button>
   </div>
 
   <script>
@@ -62,6 +73,31 @@
     function simulateProductPage()  { pageContext = { pageType: "product", checkoutError: "false" }; pushContext(); }
     function simulateCheckoutError(){ pageContext = { pageType: "checkout", checkoutError: "true" };  pushContext(); }
     function resetPage()            { pageContext = { pageType: "home", checkoutError: "false" };     pushContext(); }
+
+    // Phase 6b: Salesforce decides WHEN (invitation rules); the page decides WHAT TEXT
+    var inviteText = {
+      checkout: "Payment problem? Our team can help you finish your order.",
+      product:  "Questions about the Trench coat? Ask a style advisor."
+    };
+    function showMyInvite() {
+      var text = inviteText[pageContext.pageType];
+      if (!text) { log("Custom invitation: no text for page " + pageContext.pageType); return; }
+      document.getElementById("myInviteText").textContent = text;
+      document.getElementById("myInvite").style.display = "block";
+      log("Custom invitation shown: " + text);
+    }
+    function acceptInvite() {
+      document.getElementById("myInvite").style.display = "none";
+      log("Custom invitation accepted - opening chat");
+      embeddedservice_bootstrap.utilAPI.launchChat()
+        .catch(function (e) { log("launchChat failed: " + e); });
+    }
+    function dismissInvite() {
+      document.getElementById("myInvite").style.display = "none";
+      log("Custom invitation dismissed");
+    }
+    // With "Use Custom Component" on, Salesforce only fires this event and draws nothing itself
+    window.addEventListener("onEmbeddedMessagingInvitationShown", showMyInvite);
 
     // Watch what the widget does (Event Listeners doc)
     ["onEmbeddedMessagingReady",
