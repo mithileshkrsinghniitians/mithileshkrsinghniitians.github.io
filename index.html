@@ -53,7 +53,12 @@
       if (!window.embeddedservice_bootstrap) { log("Chat not loaded yet"); return; }
       // Phase 6: invitation conditions read these values (they must be strings)
       if (embeddedservice_bootstrap.invitationAPI) {
-        embeddedservice_bootstrap.invitationAPI.setCustomVariables(pageContext);
+        // Setup won't allow the same variable in two conditions, so condition 3 uses "pageType2"
+        embeddedservice_bootstrap.invitationAPI.setCustomVariables({
+          pageType: pageContext.pageType,
+          pageType2: pageContext.pageType,
+          checkoutError: pageContext.checkoutError
+        });
         log("invitationAPI.setCustomVariables sent");
       } else {
         log("invitationAPI not available (no invitation configured yet)");
