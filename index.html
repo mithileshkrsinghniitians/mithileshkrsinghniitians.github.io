@@ -63,16 +63,21 @@
       } else {
         log("invitationAPI not available (no invitation configured yet)");
       }
-      // Phase 7: hidden pre-chat fields travel with the conversation to the Omni flow
-      if (embeddedservice_bootstrap.prechatAPI) {
-        try {
-          embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
-            Page_Context: pageContext.pageType,
-            Checkout_Error: pageContext.checkoutError
-          });
-          log("prechatAPI.setHiddenPrechatFields sent");
-        } catch (e) { log("Hidden pre-chat not set: " + e.message); }
-      }
+      // Phase 7: hidden pre-chat fields are sent when the chat window opens (sendHiddenPrechat)
+    }
+
+    // Phase 7: hidden pre-chat fields travel with the conversation to the Omni flow.
+    // Clear the old values first, then send the current page context.
+    function sendHiddenPrechat() {
+      if (!window.embeddedservice_bootstrap || !embeddedservice_bootstrap.prechatAPI) { return; }
+      try {
+        embeddedservice_bootstrap.prechatAPI.removeHiddenPrechatFields(["Page_Context", "Checkout_Error"]);
+        embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
+          Page_Context: pageContext.pageType,
+          Checkout_Error: pageContext.checkoutError
+        });
+        log("Hidden pre-chat sent: Page_Context=" + pageContext.pageType + ", Checkout_Error=" + pageContext.checkoutError);
+      } catch (e) { log("Hidden pre-chat not set: " + e.message); }
     }
 
     function simulateProductPage()  { pageContext = { pageType: "product", checkoutError: "false" }; pushContext(); }
@@ -94,6 +99,7 @@
     function acceptInvite() {
       document.getElementById("myInvite").style.display = "none";
       log("Custom invitation accepted - opening chat");
+      sendHiddenPrechat();
       embeddedservice_bootstrap.utilAPI.launchChat()
         .catch(function (e) { log("launchChat failed: " + e); });
     }
@@ -111,10 +117,13 @@
      "onEmbeddedMessagingConversationClosed",
      "onEmbeddedMessagingInvitationShown",
      "onEmbeddedMessagingInvitationAccepted",
-     "onEmbeddedMessagingInvitationRejected"].forEach(function (evt) {
+     "onEmbeddedMessagingInvitationRejected",
+     "onEmbeddedMessagingWindowMaximized"].forEach(function (evt) {
       window.addEventListener(evt, function () {
         log("EVENT " + evt);
         if (evt === "onEmbeddedMessagingReady") { pushContext(); }
+        // The customer opened the chat window: send the context as it is now
+        if (evt === "onEmbeddedMessagingWindowMaximized") { sendHiddenPrechat(); }
       });
     });
   </script>
