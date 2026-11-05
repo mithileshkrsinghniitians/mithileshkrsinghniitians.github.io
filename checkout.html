@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>DE Lab Store - Checkout</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>DE Lab Store</h1>
+    <p>Test site for Enhanced Chat v2 (not a real shop)</p>
+    <nav><a href="index.html">Home</a><a href="product.html">Trench coat</a><a href="checkout.html">Checkout</a><a href="contact-us.html">Contact us</a></nav>
+  </header>
+
+  <div class="panel">
+    <h2>Checkout</h2>
+    <p>Trench coat &times; 1 &mdash; &pound;2,190</p>
+    <form onsubmit="return pay(event)">
+      <label>Card number</label><br><input value="4000 0000 0000 0002"><br>
+      <button type="submit">Pay now</button>
+    </form>
+    <p id="payResult"></p>
+  </div>
+  <script>
+    // Simulates the shop's payment step: it always fails, and the page raises the error event
+    function pay(e) {
+      e.preventDefault();
+      document.getElementById("payResult").innerHTML = '<span class="error">Payment declined (code CARD_DECLINED). Please try again.</span>';
+      window.DE_checkoutError("CARD_DECLINED");
+      return false;
+    }
+  </script>
+
+  <div class="panel">
+    <h2>Lab log</h2>
+    <div id="log"></div>
+  </div>
+
+  <!-- Our own invitation box; the text depends on the page -->
+  <div id="myInvite">
+    <p id="myInviteText"></p>
+    <button onclick="DE_acceptInvite()">Chat now</button>
+    <button onclick="DE_dismissInvite()">No thanks</button>
+  </div>
+
+  <script>window.DE_PAGE = { page: "checkout" };</script>
+  <script src="chat.js"></script>
+</body>
+</html>

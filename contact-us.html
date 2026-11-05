@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>DE Lab Store - Contact us</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>DE Lab Store</h1>
+    <p>Test site for Enhanced Chat v2 (not a real shop)</p>
+    <nav><a href="index.html">Home</a><a href="product.html">Trench coat</a><a href="checkout.html">Checkout</a><a href="contact-us.html">Contact us</a></nav>
+  </header>
+
+  <div class="panel">
+    <h2>Contact us</h2>
+    <p>Our advisors are available 9:00&ndash;18:00. An invitation should appear by itself after 5 seconds.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Lab log</h2>
+    <div id="log"></div>
+  </div>
+
+  <!-- Our own invitation box; the text depends on the page -->
+  <div id="myInvite">
+    <p id="myInviteText"></p>
+    <button onclick="DE_acceptInvite()">Chat now</button>
+    <button onclick="DE_dismissInvite()">No thanks</button>
+  </div>
+
+  <script>window.DE_PAGE = { page: "contactus", inviteVar: "pageType3", inviteValue: "contactus", inviteAfterSeconds: 5 };</script>
+  <script src="chat.js"></script>
+</body>
+</html>
