@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>DE Lab Boutique - Trench</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>DE Lab Store</h1>
+    <p>Site de test Enhanced Chat v2 (pas une vraie boutique) - version française</p>
+    <nav><a href="index.html">Home</a><a href="product.html">Trench coat</a><a href="checkout.html">Checkout</a><a href="contact-us.html">Contact us</a><a href="fr-product.html">Français</a></nav>
+  </header>
+
+  <div class="panel">
+    <h2>Le Trench Heritage</h2>
+    <p>Gabardine, fabriqué en Angleterre. 2 490 &euro;</p>
+    <p>Restez 30 secondes sur cette page - une invitation devrait apparaître toute seule.</p>
+    <p><a href="checkout.html">Ajouter au panier (page en anglais)</a></p>
+  </div>
+
+  <div class="panel">
+    <h2>Lab log</h2>
+    <div id="log"></div>
+  </div>
+
+  <!-- P2: French product page (lang="fr" sends Language=fr) -->
+  <div id="myInvite">
+    <p id="myInviteText"></p>
+    <button onclick="DE_acceptInvite()">Discuter</button>
+    <button onclick="DE_dismissInvite()">Non merci</button>
+  </div>
+
+  <script>window.DE_PAGE = { page: "product", inviteVar: "pageType2", inviteValue: "product", inviteAfterSeconds: 30 };</script>
+  <script src="chat.js"></script>
+</body>
+</html>

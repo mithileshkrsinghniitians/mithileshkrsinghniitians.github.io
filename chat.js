@@ -5,6 +5,9 @@
 
 (function () {
   var DE = window.DE_PAGE || { page: "home" };
+  // P2: site language comes from <html lang="..."> (en, fr, ...); the Omni flow picks the skill from it
+  var siteLanguage = (document.documentElement.lang || "en").toLowerCase();
+  var isFrench = siteLanguage.indexOf("fr") === 0;
 
   // Sent to the chat as hidden pre-chat when the chat opens (Phase 7)
   var pageContext = { pageType: DE.page, checkoutError: "false" };
@@ -14,7 +17,11 @@
   // (3) pageType2 = product, (4) pageType3 = contactus. Values must be strings.
   var inviteVars = { pageType: DE.page, checkoutError: "false", pageType2: "none", pageType3: "none" };
 
-  var inviteText = {
+  var inviteText = isFrench ? {
+    checkout:  "Un problème de paiement ? Un conseiller peut vous aider à finaliser votre commande.",
+    product:   "Vous souhaitez en savoir plus sur le trench ? Demandez à un conseiller style.",
+    contactus: "Bonjour, comment pouvons-nous vous aider ?"
+  } : {
     checkout:  "Payment problem? An advisor can help you complete your order.",
     product:   "Would you like more information about the Trench coat? Ask a style advisor.",
     contactus: "Hello, how may we help you today?"
@@ -40,12 +47,13 @@
   function sendHiddenPrechat() {
     if (!window.embeddedservice_bootstrap || !embeddedservice_bootstrap.prechatAPI) { return; }
     try {
-      embeddedservice_bootstrap.prechatAPI.removeHiddenPrechatFields(["Page_Context", "Checkout_Error"]);
+      embeddedservice_bootstrap.prechatAPI.removeHiddenPrechatFields(["Page_Context", "Checkout_Error", "Language"]);
       embeddedservice_bootstrap.prechatAPI.setHiddenPrechatFields({
         Page_Context: pageContext.pageType,
-        Checkout_Error: pageContext.checkoutError
+        Checkout_Error: pageContext.checkoutError,
+        Language: siteLanguage
       });
-      log("Hidden pre-chat sent: Page_Context=" + pageContext.pageType + ", Checkout_Error=" + pageContext.checkoutError);
+      log("Hidden pre-chat sent: Page_Context=" + pageContext.pageType + ", Checkout_Error=" + pageContext.checkoutError + ", Language=" + siteLanguage);
     } catch (e) { log("Hidden pre-chat not set: " + e.message); }
   }
 
@@ -78,7 +86,11 @@
     log("Invitation dismissed");
   };
 
+  // The widget fires Ready again when a chat ends; set up the page only once per page load
+  var readyDone = false;
   function onReady() {
+    if (readyDone) { log("Ready again (chat ended) - page setup already done"); return; }
+    readyDone = true;
     sendInviteVars("page load");
     // Pages such as product / contact us allow their invitation only after some time on the page
     if (DE.inviteVar) {
@@ -107,6 +119,7 @@
   // Salesforce Enhanced Chat v2 code snippet (loaded the same way on every page)
   window.initEmbeddedMessaging = function () {
     try {
+      // Widget UI stays English: the deployment has only en_US set up (the routing uses the Language field instead)
       embeddedservice_bootstrap.settings.language = "en_US";
       // Lab only: print the widget's internal logs (invitation decisions) to the browser console
       embeddedservice_bootstrap.settings.devMode = true;
@@ -116,7 +129,7 @@
         "https://orgfarm-46a2e87dcd-dev-ed.develop.my.site.com/ESWDELabWebCha1793226077623",
         { scrt2URL: "https://orgfarm-46a2e87dcd-dev-ed.develop.my.salesforce-scrt.com" }
       );
-      log("Page: " + DE.page + " - chat init called");
+      log("Page: " + DE.page + " (language " + siteLanguage + ") - chat init called");
     } catch (err) {
       console.error("Error loading Embedded Messaging: ", err);
       log("init error: " + err.message);
