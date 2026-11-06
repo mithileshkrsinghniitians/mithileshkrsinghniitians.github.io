@@ -113,6 +113,9 @@
       log("EVENT " + evt);
       if (evt === "onEmbeddedMessagingReady") { onReady(); }
       if (evt === "onEmbeddedMessagingWindowMaximized") { sendHiddenPrechat(); }
+      // P2 T4 finding: "Continue conversation" after a chat ended can start a NEW conversation
+      // in the open window, with no hidden pre-chat (so no Language). Re-send it for the next one.
+      if (evt === "onEmbeddedMessagingConversationClosed") { sendHiddenPrechat(); }
     });
   });
 
