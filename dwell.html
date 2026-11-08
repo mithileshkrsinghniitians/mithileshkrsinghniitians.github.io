@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>DE Lab Store - Scarf (built-in timer test)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>DE Lab Store</h1>
+    <p>Test site for Enhanced Chat v2 (not a real shop)</p>
+    <nav><a href="index.html">Home</a><a href="product.html">Trench coat</a><a href="checkout.html">Checkout</a><a href="contact-us.html">Contact us</a><a href="fr-product.html">Français</a></nav>
+  </header>
+
+  <div class="panel">
+    <h2>The Check Cashmere Scarf</h2>
+    <p>P6 test page: this page has <b>no timer in our code</b>. The invitation uses the
+       built-in Salesforce conditions "URL Match" (dwell.html) and "Seconds on Page" (20).</p>
+    <p>Stay on this page for 20 seconds - an invitation should appear by itself.</p>
+    <p><a href="checkout.html">Add to bag and check out</a></p>
+  </div>
+
+  <div class="panel">
+    <h2>Lab log</h2>
+    <div id="log"></div>
+  </div>
+
+  <!-- Our own invitation box; the text depends on the page -->
+  <div id="myInvite">
+    <p id="myInviteText"></p>
+    <button onclick="DE_acceptInvite()">Chat now</button>
+    <button onclick="DE_dismissInvite()">No thanks</button>
+  </div>
+
+  <script>window.DE_PAGE = { page: "dwell" };</script>
+  <script src="chat.js"></script>
+</body>
+</html>

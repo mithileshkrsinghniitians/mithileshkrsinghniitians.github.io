@@ -24,7 +24,8 @@
   } : {
     checkout:  "Payment problem? An advisor can help you complete your order.",
     product:   "Would you like more information about the Trench coat? Ask a style advisor.",
-    contactus: "Hello, how may we help you today?"
+    contactus: "Hello, how may we help you today?",
+    dwell:     "Still deciding on the scarf? A style advisor can help."
   };
 
   function log(msg) {
